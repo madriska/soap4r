@@ -162,6 +162,12 @@ class Router
     if env.nil?
       raise ArgumentError.new("illegal SOAP marshal format")
     end
+
+    if $DEBUG_SOAP
+      Rails.logger.debug("SOAP Routing: #{conn_data.soapaction}")
+      Rails.logger.debug("SOAP body: #{env.body}")
+    end
+
     op = lookup_operation(conn_data.soapaction, env.body)
     headerhandler = @headerhandler.dup
     @headerhandlerfactory.each do |f|
@@ -176,6 +182,10 @@ class Router
       conn_data.is_fault = true if soap_response.is_a?(SOAPFault)
       default_encodingstyle = op.response_default_encodingstyle
     rescue Exception => e
+      if $DEBUG_SOAP
+        Rails.logger.debug("Exception when routing: #{e.inspect}")
+      end
+
       # If a wsdl fault was raised by service, the fault declaration details
       # is kept in wsdl_fault. Otherwise (exception is a program fault)
       # wsdl_fault is nil

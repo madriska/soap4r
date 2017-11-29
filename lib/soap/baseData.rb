@@ -675,6 +675,10 @@ class SOAPElement
 
   # Element interfaces.
   def add(value)
+    if $DEBUG_SOAP
+      Rails.logger.debug("SOAPElement#add: #{inspect} / #{value.inspect}")
+    end
+
     name = value.elename.name
     @array.push(name)
     @data.push(value)
